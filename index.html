@@ -1,1 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKR International - Construction & Real Estate</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { background: #f5f5f5; }
+    header { background: #1a2a4a; color: white; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
+    header img { height: 50px; }
+    nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
+    .slider { position: relative; height: 400px; overflow: hidden; }
+    .slider img { width: 100%; height: 400px; object-fit: cover; }
+    .form-container { max-width: 400px; margin: 40px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .form-container h2 { text-align: center; margin-bottom: 20px; color: #1a2a4a; }
+    .form-container input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+    .form-container button { width: 100%; padding: 12px; background: #1a2a4a; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+    .form-container button:hover { background: #2c3e6b; }
+    footer { background: #1a2a4a; color: white; text-align: center; padding: 20px; margin-top: 40px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
 
+<header>
+  <img src="images/logo.png" alt="SKR Logo">
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">About</a>
+    <a href="#">Projects</a>
+    <a href="#">Contact</a>
+    <a href="#" onclick="showSignup()">Signup</a>
+  </nav>
+</header>
+
+<div class="slider">
+  <img src="images/slide1.jpg" alt="Construction">
+</div>
+
+<div class="form-container hidden" id="signupForm">
+  <h2>Create Account</h2>
+  <input type="text" id="name" placeholder="Full Name" required>
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="password" id="password" placeholder="Password" required>
+  <button onclick="signup()">Sign Up</button>
+</div>
+
+<footer>
+  <p>© 2026 SKR International. All Rights Reserved.</p>
+</footer>
+
+<script type="module">
+  // Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // TODO: Apna Firebase config yahan paste karo
+  const firebaseConfig = {
+    apiKey: "APNA_API_KEY_YAHAN",
+    authDomain: "APNA_AUTH_DOMAIN",
+    projectId: "APNA_PROJECT_ID",
+    storageBucket: "APNA_STORAGE_BUCKET",
+    messagingSenderId: "APNA_SENDER_ID",
+    appId: "APNA_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.showSignup = function() {
+    document.getElementById('signupForm').classList.remove('hidden');
+  }
+
+  window.signup = async function() {
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      await setDoc(doc(db, "users", user.uid), {
+        name: name,
+        email: email,
+        createdAt: new Date()
+      });
+
+      alert("Account Created Successfully!");
+      document.getElementById('signupForm').classList.add('hidden');
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
+  }
+</script>
+
+</body>
+</html>
